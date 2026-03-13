@@ -31,25 +31,26 @@ class VectorSearcher:
             1,
         )
 
-        sql = f"""
+        sql = """
         SELECT
             document_title,
             page_number,
             chunk_index,
             content,
-            embedding <=> '{vector_literal}'::vector AS distance
+            embedding <=> %s::vector AS distance
         FROM document_chunks
-        ORDER BY embedding <=> '{vector_literal}'::vector
-        LIMIT {int(k)}
+        ORDER BY embedding <=> %s::vector
+        LIMIT %s
         """
 
         with psycopg.connect(psycopg_url) as conn:
             with conn.cursor() as cur:
-                cur.execute(sql)
+                cur.execute(sql, (vector_literal, vector_literal, int(k)))
                 rows = cur.fetchall()
 
         results = []
         for row in rows:
+            distance = float(row[4])
             results.append(
                 {
                     "content": row[3],
@@ -58,7 +59,8 @@ class VectorSearcher:
                         "page_number": row[1],
                         "chunk_index": row[2],
                     },
-                    "score": float(row[4]),
+                    "distance": distance,
+                    "similarity": 1 - distance,
                 }
             )
         return results

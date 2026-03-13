@@ -18,7 +18,7 @@ def main():
     print(f"Loaded {len(pages)} pages")
 
     print("Chunking documents...")
-    chunks = chunk_documents(pages[:20])
+    chunks = chunk_documents(pages[:200])
     print(f"Created {len(chunks)} chunks")
 
     embedder = TitanEmbedder()

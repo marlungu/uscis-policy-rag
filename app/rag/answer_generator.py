@@ -8,12 +8,7 @@ class AnswerGenerator:
         self.searcher = VectorSearcher()
         self.llm = BedrockClaudeClient()
 
-    def build_prompt(self, question: str, k: int | None = None) -> str:
-        if k is None:
-            k = settings.top_k
-
-        results = self.searcher.search(question, k=k)
-
+    def build_prompt(self, question: str, results: list[dict]) -> str:
         context_blocks = []
 
         for i, r in enumerate(results, start=1):
@@ -35,14 +30,15 @@ class AnswerGenerator:
 You are an assistant that answers questions about USCIS immigration policy.
 
 Use ONLY the information in the sources below.
-
-If the answer cannot be found in the sources, say:
+Do not use outside knowledge.
+If the answer cannot be found in the sources, say exactly:
 "I do not have enough information from the USCIS Policy Manual."
 
 Do not invent facts.
+Do not guess.
 Do not give legal advice.
-Keep the answer clear and direct.
-Cite the source numbers you used, like [Source 1].
+Keep the answer clear, direct and factual.
+When possible, cite the source numbers you used, like [Source 1].
 
 Sources:
 {context}
@@ -52,18 +48,19 @@ Question:
 
 Answer:
 """
-        return prompt
+        return prompt.strip()
 
     def answer(self, question: str, k: int | None = None) -> dict:
         if k is None:
             k = settings.top_k
 
         results = self.searcher.search(question, k=k)
-        prompt = self.build_prompt(question, k=k)
+        prompt = self.build_prompt(question, results=results)
         answer_text = self.llm.generate(prompt)
 
         return {
             "question": question,
             "answer": answer_text,
             "sources": [r["metadata"] for r in results],
+            "retrieved_chunks": results,
         }
