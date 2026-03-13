@@ -1,10 +1,15 @@
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, text, event
+from pgvector.psycopg import register_vector
+
 
 from app.config import settings
 
 
 engine = create_engine(settings.postgres_url, future=True)
 
+@event.listens_for(engine, "connect")
+def connect(dbapi_connection, connection_record):
+    register_vector(dbapi_connection)
 
 def check_database_connection() -> None:
     with engine.connect() as connection:
