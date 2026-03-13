@@ -84,12 +84,3 @@ Upload at least one USCIS PDF to the configured S3 bucket and prefix, then run:
 ```bash
 python -m scripts.test_ingestion
 ```
-
-## Step 10 — Stage and Commit
-
-Once the test works, run:
-
-```bash
-git add app/ingestion/__init__.py app/ingestion/loader.py app/ingestion/chunker.py scripts/test_ingestion.py README.md
-git status
-```
