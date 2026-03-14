@@ -6,6 +6,9 @@ from app.rag.query_logger import log_query
 from app.config import settings
 
 
+MAX_CONTEXT_CHUNKS = 4
+
+
 class AnswerGenerator:
     def __init__(self):
         self.searcher = VectorSearcher()
@@ -14,14 +17,15 @@ class AnswerGenerator:
     def build_prompt(self, question: str, results: list[dict]) -> str:
         context_blocks = []
 
-        for i, r in enumerate(results, start=1):
+        for r in results[:MAX_CONTEXT_CHUNKS]:
             meta = r["metadata"]
 
+            source_label = (
+            f"Vol 12 | page {meta['page_number']} | chunk {meta['chunk_index']}"
+            )
+
             block = (
-                f"[Source {i}]\n"
-                f"Document: {meta['document_title']}\n"
-                f"Page: {meta['page_number']}\n"
-                f"Chunk: {meta['chunk_index']}\n"
+                f"[{source_label}]\n"
                 f"Content:\n{r['content']}\n"
             )
 
@@ -41,7 +45,12 @@ Do not invent facts.
 Do not guess.
 Do not give legal advice.
 Keep the answer clear, direct and factual.
-When possible, cite the source numbers you used, like [Source 1].
+
+When you cite a source, use the exact source label provided in brackets.
+Example:
+[Vol 12 | page 2330 | chunk 7719]
+
+Do not invent source numbers like [Source 1].
 
 Sources:
 {context}

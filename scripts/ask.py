@@ -1,5 +1,7 @@
 from app.rag.answer_generator import AnswerGenerator
 
+PROMPT = "Ask a USCIS policy question: "
+
 
 def main():
     generator = AnswerGenerator()
@@ -8,7 +10,8 @@ def main():
     print("Type 'exit' to quit.\n")
 
     while True:
-        question = input("Ask a USCIS policy question: ").strip()
+        print()
+        question = input(PROMPT).strip()
 
         if not question:
             continue
@@ -23,6 +26,7 @@ def main():
         print(result["answer"])
 
         print("\nRetrieved Chunks:\n")
+
         for i, chunk in enumerate(result["retrieved_chunks"], start=1):
             meta = chunk["metadata"]
             preview = chunk["content"][:220].replace("\n", " ")
