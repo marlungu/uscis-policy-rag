@@ -35,9 +35,7 @@ class AnswerGenerator:
         for r in used_chunks:
             meta = r["metadata"]
 
-            source_label = (
-                f"Vol 12 | page {meta['page_number']} | chunk {meta['chunk_index']}"
-            )
+            source_label = "USCIS Policy Manual, Vol. 12, PDF Page {meta['page_number']}"
 
             block = (
                 f"[{source_label}]\n"
@@ -63,7 +61,7 @@ Keep the answer clear, direct and factual.
 
 When you cite a source, use the exact source label provided in brackets.
 Example:
-[Vol 12 | page 2330 | chunk 7719]
+[USCIS Policy Manual, Vol. 12, PDF Page 2330]
 
 Do not invent source numbers like [Source 1].
 
