@@ -1,5 +1,8 @@
 from app.retrieval.vector_search import VectorSearcher
 from app.rag.llm_client import BedrockClaudeClient
+
+from app.rag.query_logger import log_query
+
 from app.config import settings
 
 
@@ -57,6 +60,13 @@ Answer:
         results = self.searcher.search(question, k=k)
         prompt = self.build_prompt(question, results=results)
         answer_text = self.llm.generate(prompt)
+
+        log_query(
+            question=question,
+            answer=answer_text,
+            retrieved_chunks=results,
+            top_k=k,
+        )
 
         return {
             "question": question,
