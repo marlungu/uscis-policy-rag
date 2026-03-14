@@ -6,6 +6,13 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from app.config import settings
 
 
+HEADING_PATTERNS = [
+    r"^\s*Volume\s+\d+\b.*$",
+    r"^\s*Part\s+[A-Z]\b.*$",
+    r"^\s*Chapter\s+\d+\b.*$",
+]
+
+
 def clean_text(text: str) -> str:
     if not text:
         return ""
@@ -35,7 +42,6 @@ def clean_text(text: str) -> str:
         cleaned_lines.append(line)
 
     cleaned_text = "\n".join(cleaned_lines)
-
     cleaned_text = re.sub(r"\n{2,}", "\n", cleaned_text).strip()
     return cleaned_text
 
@@ -70,6 +76,36 @@ def should_skip_page(text: str) -> bool:
     return False
 
 
+def extract_heading_context(text: str) -> str:
+    headings = []
+
+    for line in text.splitlines():
+        stripped = line.strip()
+        if any(re.match(pattern, stripped, re.IGNORECASE) for pattern in HEADING_PATTERNS):
+            headings.append(stripped)
+
+    # Keep only the first few distinct headings to avoid noisy repetition
+    deduped = []
+    seen = set()
+
+    for heading in headings:
+        key = heading.lower()
+        if key not in seen:
+            deduped.append(heading)
+            seen.add(key)
+
+    return " | ".join(deduped[:3])
+
+
+def add_section_context(text: str) -> str:
+    heading_context = extract_heading_context(text)
+
+    if not heading_context:
+        return text
+
+    return f"{heading_context}\n\n{text}"
+
+
 
 def chunk_documents(pages: list[Document]) -> list[Document]:
     splitter = RecursiveCharacterTextSplitter(
@@ -78,7 +114,7 @@ def chunk_documents(pages: list[Document]) -> list[Document]:
         separators=["\n\n", "\n", ". ", " ", ""],
     )
 
-    cleaned_pages = []
+    enriched_pages = []
 
     for page in pages:
         cleaned = clean_text(page.page_content)
@@ -86,14 +122,16 @@ def chunk_documents(pages: list[Document]) -> list[Document]:
         if should_skip_page(cleaned):
             continue
 
-        cleaned_pages.append(
+        enriched_text = add_section_context(cleaned)
+
+        enriched_pages.append(
             Document(
-                page_content=cleaned,
+                page_content=enriched_text,
                 metadata=page.metadata.copy(),
             )
         )
 
-    chunks = splitter.split_documents(cleaned_pages)
+    chunks = splitter.split_documents(enriched_pages)
 
     for i, chunk in enumerate(chunks):
         chunk.metadata["chunk_index"] = i
