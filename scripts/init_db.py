@@ -23,7 +23,7 @@ def initialize_database() -> None:
                     chunk_index INTEGER,
                     section_heading TEXT,
                     content TEXT NOT NULL,
-                    embedding VECTOR(1024)
+                    embedding VECTOR(1024),
                     created_at TIMESTAMP NOT NULL DEFAULT NOW()
                 );
                 """
