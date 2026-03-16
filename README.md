@@ -1,6 +1,5 @@
 
 # USCIS Policy RAG
-Reference implementation of a governance-aware Retrieval-Augmented Generation system for answering questions about the USCIS Policy Manual.
 Production-grade Retrieval-Augmented Generation (RAG) system for answering questions about the USCIS Policy Manual. Designed with auditability, traceability, and reliability in mind.
 
 **Stack:** AWS Bedrock (Claude Sonnet) | Amazon Titan Embeddings | PostgreSQL + pgvector | FastAPI | Docker
