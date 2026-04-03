@@ -17,9 +17,9 @@ In regulated or high-risk environments, that’s not acceptable.
 
 This system makes every answer traceable, inspectable, and reproducible.
 
-**Stack:** AWS Bedrock (Claude Sonnet) | Amazon Titan Embeddings | PostgreSQL + pgvector | FastAPI | Docker
+**Stack:** AWS Bedrock (Claude Sonnet 4.6) | Amazon Titan Embeddings | PostgreSQL + pgvector | FastAPI | Docker
 
-![Architecture Diagram](docs/architecture.png)
+![Architecture Diagram](docs/architecture-diagram.png)
 *Architecture overview showing ingestion, retrieval, and governance layers.*
 
 ---
@@ -187,7 +187,7 @@ In regulated environments, simply returning the correct answer is not enough. Yo
 
 - Python 3.12+
 - Docker and Docker Compose
-- AWS account with Bedrock access (Claude Sonnet + Titan Embeddings enabled)
+- AWS account with Bedrock access (Claude Sonnet 4.6 + Titan Embeddings enabled)
 
 ### Setup
 
@@ -411,6 +411,7 @@ audit-ready-rag-system/
 ├── Dockerfile
 ├── docker-compose.yml
 ├── Makefile
+├── demo_ui.py              # Streamlit UI for interactive demos
 └── requirements.txt
 ```
 
